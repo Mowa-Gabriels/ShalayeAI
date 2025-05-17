@@ -1,4 +1,4 @@
-"# ShalayeAI: Your Pocket Product Guru 🕵️‍♀️" 
+"# ShalayeAI: Your AI Sidekick for Healthier Choices 🍎🧴💊" 
 
 Ever squint at a product label and wonder what half those ingredients even are? 🤔 ShalayeAI's got your back! Think of it as your super chill, AI-powered buddy who spills the tea on what you're about to eat, drink, or slather on.
 

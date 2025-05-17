@@ -69,7 +69,8 @@ def main():
          """
         <div style="text-align: center;">
             <h2 style="color: #263e73; font-size: 2.2em; font-weight: 700; margin-bottom: 0.5em;">
-                Unlock the Power of Informed Choices with ShalayeAI
+                Your AI Sidekick for Healthier Choices 🍎🧴💊
+
             </h2>
             <p style="color: #555; font-size: 1.1em; line-height: 1.7; margin-bottom: 2em;">
                 ShalayeAI is a wellness tool designed to empower you with knowledge about the products you consume.  
