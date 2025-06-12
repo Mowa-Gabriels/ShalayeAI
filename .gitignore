@@ -139,7 +139,8 @@ env.bak/
 venv.bak/
 
 shalaye_env
-
+runila.py
+.devcontainer
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -149,7 +150,7 @@ shalaye_env
 
 # mkdocs documentation
 /site
-
+tmp
 # mypy
 .mypy_cache/
 .dmypy.json
