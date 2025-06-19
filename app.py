@@ -6,13 +6,27 @@ from agent_task.agent_instructions import *
 from dotenv import load_dotenv
 import streamlit as st
 import os,tempfile,re,time 
-from shalaye_utils import optimize_image, extract_scores, extract_risks, plot_parameter_scores 
-
+from shalaye_utils import *
 
 load_dotenv()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 EXA_API_KEY = os.getenv("EXA_API_KEY")
+
+
+st.set_page_config(
+    page_title="ShalayeAI",
+    page_icon="💊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+st.logo(
+    "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/anthropic.png"
+)
+
+
+
 
 
 def create_shalaye_agent() -> Agent:
@@ -51,7 +65,6 @@ def create_followup_agent() -> Agent:
     )
     return followup_agent
 
-
 def optimize_image(image: Image.Image) -> Image.Image:
     """
     Optimizes an image for analysis by resizing and converting it to JPEG.
@@ -65,7 +78,6 @@ def optimize_image(image: Image.Image) -> Image.Image:
     max_size = (720, 720) 
     image.thumbnail(max_size)
     return image
-
 
 def initialize_user_profile():
     """Initialize user profile in session state if not exists"""
@@ -85,15 +97,14 @@ def initialize_user_profile():
             'profile_complete': False
         }
 
-
 def profile_setup_page():
     """Render the profile setup page"""
-    st.title("👨🏻‍💼📝Health Profile Setup")
+    st.title("👨🏻‍💼📝 Health Profile Setup")
     
     st.markdown("""
-    <div style="background-color: #f0f8ff; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-        <h4 style="color: #263e73; margin-top: 0;">Why Personal Information?</h4>
-        <p style="color: #555; margin-bottom: 0;">
+    <div class="analysis-card">
+        <h4 style="color: #D97757; margin-top: 0;">Why Personal Information?</h4>
+        <p style="margin-bottom: 0;">
             Your personal health profile helps ShalayeAI provide personalized recommendations 
             tailored to your specific needs, goals, and health conditions. All information is 
             kept private and used only for analysis.
@@ -240,7 +251,6 @@ def profile_setup_page():
             st.session_state.current_page = "main"
             st.rerun()
 
-
 def get_personalized_query_context():
     """Generate personalized context for the agent based on user profile"""
     if not st.session_state.user_profile['profile_complete']:
@@ -276,8 +286,10 @@ def get_personalized_query_context():
     
     return context
 
-
 def main():
+    # Apply the Anthropic theme
+    apply_anthropic_theme()
+    
     # Initialize session state
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "main"
@@ -290,21 +302,22 @@ def main():
         return
 
     # Main page content
-    st.title("ShalayeAI")
-    st.html(
+    st.markdown('<h1 class="anthropic-header">ShalayeAI</h1>', unsafe_allow_html=True)
+    
+    st.markdown(
          """
-        <div style="text-align: center;">
-            <h2 style="color: #263e73; font-size: 2.2em; font-weight: 700; margin-bottom: 0.5em;">
+        <div class="analysis-card" style="text-align: center;">
+            <h2 style="color: #D97757; font-size: 2.2em; font-weight: 700; margin-bottom: 0.5em;">
                 Your AI Sidekick for Healthier Choices 🍎🧴💊
             </h2>
-            <p style="color: #555; font-size: 1.1em; line-height: 1.7; margin-bottom: 2em;">
+            <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 0;">
                 ShalayeAI is a wellness tool designed to empower you with knowledge about the products you consume.  
                 Simply upload an image of the product label or ingredients list, and ShalayeAI will provide you with a detailed, 
-                easy-to-understand breakdown of the components.  It analyzes food, drugs, and drinks, giving you the information 
+                easy-to-understand breakdown of the components. It analyzes food, drugs, and drinks, giving you the information 
                 you need to make informed choices for a healthier lifestyle.
             </p>
         </div>
-        """
+        """, unsafe_allow_html=True
     )
 
     # Initialize session state variables for the two-stage flow
@@ -325,9 +338,14 @@ def main():
         # Profile Setup Button
         st.markdown("---")
         profile_status = "✅ Profile Complete" if st.session_state.user_profile['profile_complete'] else "⚪ No Profile"
-        if st.button(f"🧑‍⚕️ Personal Profile Setup\n{profile_status}", use_container_width=True, type="secondary"):
+        
+        profile_class = "profile-complete" if st.session_state.user_profile['profile_complete'] else "profile-incomplete"
+        
+        if st.button(f"🧑‍⚕️ Personal Profile Setup", use_container_width=True, type="secondary"):
             st.session_state.current_page = "profile"
             st.rerun()
+        
+        st.markdown(f'<div class="{profile_class}">{profile_status}</div>', unsafe_allow_html=True)
         
         if st.session_state.user_profile['profile_complete']:
             st.success("🎯 Personalized analysis enabled!")
@@ -407,7 +425,7 @@ def main():
             except Exception as e:
                 st.error(f"❌ Error during initial analysis: Ensure you are connected to the internet and API keys are valid. Error details: {str(e)}")
 
-    # Main Content Display Area 
+    # Main Content Display Area
     if st.session_state.initial_analysis_done and st.session_state.full_report_content:
         content = st.session_state.full_report_content
 
@@ -418,22 +436,24 @@ def main():
         #Display Product Identification
         detected = re.search(r'📸 Detected: (.+)', content)
         if detected:
+            # Themed product name
             st.markdown(f"""
-            ### Product: <span style="color: #6c5ce7;">{detected.group(1)}</span>
+            ### Product: <span style="color: #a29bfe;">{detected.group(1)}</span>
             ---
             """, unsafe_allow_html=True)
 
-        # Display Parameter Breakdown 
+        # Display Parameter Breakdown
         breakdown_text = re.search(r'🔍 Breakdown:(.+?)(?:🚨|$)', content, re.DOTALL)
         if breakdown_text:
             st.subheader("📊 Health Indicators")
             scores = extract_scores(breakdown_text.group(1))
             if scores:
                 for param, score in scores.items():
+                    # Themed score display
                     st.markdown(f"""
                     <div style="margin-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="color: white;">{param}</span>
+                            <span style="color: #F0F0F0;">{param}</span>
                             <span style="color: #a29bfe;">{score}/5</span>
                         </div>
                         <div style="height: 8px; border-radius: 4px; background: linear-gradient(90deg, #6c5ce7, #a29bfe); width: {score*20}%;"></div>
@@ -464,7 +484,7 @@ def main():
         st.header("📝 Full Analysis Report")
         st.markdown(content, unsafe_allow_html=True)
 
-        st.markdown("---") 
+        st.markdown("---")
         st.header("Ask ShalayeAI More Questions!")
 
         # Display chat history
@@ -485,7 +505,7 @@ def main():
             "Is this safe for pregnant women?",
             "I want more information about allergies.",
         ]
-        
+
         # Add personalized suggestions if profile exists
         if st.session_state.user_profile['profile_complete']:
             personalized_suggestions = [
@@ -508,7 +528,7 @@ def main():
                 try:
                     followup_agent = create_followup_agent()
 
-                    
+
                     # Add personalization context to follow-up queries too
                     personalized_context = get_personalized_query_context()
                     full_follow_up_query = st.session_state.user_query + personalized_context
@@ -521,8 +541,8 @@ def main():
                         "query": st.session_state.user_query,
                         "response": follow_up_response.content
                     })
-                    st.session_state.user_query = "" 
-                    st.rerun() 
+                    st.session_state.user_query = ""
+                    st.rerun()
 
                 except Exception as e:
                     st.error(f"❌ Error during follow-up analysis: {str(e)}")

@@ -1,4 +1,4 @@
-# shalaye_utils.py
+import streamlit as st
 import re
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -90,3 +90,303 @@ def plot_parameter_scores(scores: dict):
     ax.tick_params(axis='y', colors='white')
     plt.tight_layout()
     return fig
+
+
+def apply_anthropic_theme():
+    st.html(
+        """
+        <style>
+        /* Import fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        /* Root variables - Anthropic dark theme */
+        :root {
+            --primary-color: #D97757;
+            --secondary-color: #B85D3E;
+            --secondary-background: #2C2A29;
+            --text-color: #F7F3F0;
+            --accent-color: #E8B893;
+            --border-color: #3D3A38;
+            --hover-color: #413E3C;
+            --success-color: #52C41A;
+            --warning-color: #FAAD14;
+            --error-color: #FF4D4F;
+        }
+        
+        /* Global font smoothing */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Main app background */
+        .stApp {
+            background-color: var(--background-color) !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+        
+        /* Typography hierarchy */
+        h1 {
+            font-size: 2.5rem !important;
+            font-weight: 700 !important;
+            color: var(--text-color) !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        h2 {
+            font-size: 2rem !important;
+            font-weight: 600 !important;
+            color: var(--text-color) !important;
+            margin-bottom: 0.8rem !important;
+        }
+        
+        h3 {
+            font-size: 1.5rem !important;
+            font-weight: 500 !important;
+            color: var(--text-color) !important;
+            margin-bottom: 0.6rem !important;
+        }
+        
+        /* Sidebar styling */
+        .stSidebar {
+            background-color: var(--secondary-background) !important;
+            border-right: 1px solid var(--border-color) !important;
+        }
+        
+        .stSidebar .stButton > button {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stSidebar .stButton > button:hover {
+            background-color: var(--secondary-color) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(217, 119, 87, 0.3) !important;
+        }
+        
+        /* Primary buttons */
+        .stButton > button[data-baseweb="button"][kind="primary"] {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stButton > button[data-baseweb="button"][kind="primary"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(217, 119, 87, 0.4) !important;
+        }
+        
+        /* Secondary buttons */
+        .stButton > button {
+            background-color: var(--secondary-background) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            font-weight: 400 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stButton > button:hover {
+            background-color: var(--hover-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+        
+        /* Form inputs */
+        .stSelectbox > div > div {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            color: var(--text-color) !important;
+        }
+        
+        .stTextInput > div > div > input {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            color: var(--text-color) !important;
+        }
+        
+        .stTextArea > div > div > textarea {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            color: var(--text-color) !important;
+        }
+        
+        /* File uploader */
+        .stFileUploader > div {
+            background-color: var(--secondary-background) !important;
+            border: 2px dashed var(--border-color) !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stFileUploader > div:hover {
+            border-color: var(--primary-color) !important;
+            background-color: var(--hover-color) !important;
+        }
+        
+        /* Status containers */
+        .stAlert {
+            border-radius: 8px !important;
+            border: none !important;
+        }
+        
+        .stAlert[data-baseweb="notification"][kind="info"] {
+            background-color: rgba(24, 144, 255, 0.1) !important;
+            border-left: 4px solid #1890FF !important;
+        }
+        
+        .stAlert[data-baseweb="notification"][kind="success"] {
+            background-color: rgba(82, 196, 26, 0.1) !important;
+            border-left: 4px solid var(--success-color) !important;
+        }
+        
+        .stAlert[data-baseweb="notification"][kind="warning"] {
+            background-color: rgba(250, 173, 20, 0.1) !important;
+            border-left: 4px solid var(--warning-color) !important;
+        }
+        
+        .stAlert[data-baseweb="notification"][kind="error"] {
+            background-color: rgba(255, 77, 79, 0.1) !important;
+            border-left: 4px solid var(--error-color) !important;
+        }
+        
+        /* Metrics */
+        .stMetric {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            padding: 1rem !important;
+        }
+        
+        /* Expander */
+        .stExpander {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Form container */
+        .stForm {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            padding: 1.5rem !important;
+        }
+        
+        /* Progress bars */
+        .stProgress .st-bo {
+            background-color: var(--primary-color) !important;
+        }
+        
+        /* Spinner */
+        .stSpinner {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Custom card styling */
+        .analysis-card {
+            background: linear-gradient(135deg, var(--secondary-background), var(--hover-color)) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            padding: 1.5rem !important;
+            margin: 1rem 0 !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .analysis-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        /* Health indicator bars */
+        .health-indicator {
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color)) !important;
+            border-radius: 4px !important;
+            height: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        /* Chat styling */
+        .stChatMessage {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Multiselect */
+        .stMultiSelect > div {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Text color adjustments */
+        .stMarkdown, .stText, p, div, span, label {
+            color: var(--text-color) !important;
+        }
+        
+        /* Special styling for profile status */
+        .profile-complete {
+            background: linear-gradient(135deg, var(--success-color), #73d13d) !important;
+            color: white !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px !important;
+            font-weight: 500 !important;
+        }
+        
+        .profile-incomplete {
+            background: linear-gradient(135deg, var(--warning-color), #ffc53d) !important;
+            color: var(--background-color) !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Navigation styling */
+        [data-testid="stSidebarNav"] {
+            background-color: var(--secondary-background) !important;
+        }
+        
+        [data-testid="stSidebarNav"] li a {
+            color: var(--text-color) !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        [data-testid="stSidebarNav"] li a:hover {
+            background-color: var(--hover-color) !important;
+        }
+        
+        /* Form styling improvements */
+        .stNumberInput > div > div > input {
+            background-color: var(--secondary-background) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            color: var(--text-color) !important;
+        }
+        
+        /* Custom header styling */
+        .anthropic-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            margin-bottom: 2rem !important;
+        }
+        </style>
+        """
+    )
+
